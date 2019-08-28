@@ -31,14 +31,16 @@ pub fn nth(n: u32) -> Option<u32> {
 
     for i in PrimeCandidates::new() {
         for j in PrimeCandidates::new() {
-            if j >= i {  // prime number, since no smaller divisor was ruled out
+            if j >= i {
+                // prime number, since no smaller divisor was ruled out
                 v.push(i);
                 if v.len() as u32 == n {
                     return Some(i);
                 }
                 break;
             }
-            if i % j == 0 {  // not a prime since it's even divisble by a smaller number
+            if i % j == 0 {
+                // not a prime since it's even divisble by a smaller number
                 break;
             }
         }
