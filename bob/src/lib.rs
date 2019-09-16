@@ -8,22 +8,23 @@ const WHATEVER: &str = "Whatever.";
 
 /// Return Bob's response to a statement, a question, or yelling.
 pub fn reply(message: &str) -> &str {
-    let m: &str = message.trim();
-    let is_question: bool = m.ends_with("?");
-    let contains_alphabetic_characters: bool = m.chars().any(|character| character.is_alphabetic());
-    let is_uppercase: bool = contains_alphabetic_characters && m == m.to_uppercase();
-    let is_yelled: bool = contains_alphabetic_characters && is_uppercase;
+    let msg: &str = message.trim();
 
-    if is_yelled {
-        if is_question {
-            return CALM_DOWN;
-        } else {
-            return WHOA_CHILL;
+    match msg.is_empty() {
+        true => FINE,
+        false => {
+            let is_question: bool = msg.ends_with("?");
+            let contains_alphabetic_characters: bool =
+                msg.chars().any(|character| character.is_alphabetic());
+            let is_uppercase: bool = contains_alphabetic_characters && msg == msg.to_uppercase();
+            let is_yelled: bool = contains_alphabetic_characters && is_uppercase;
+
+            match (is_yelled, is_question) {
+                (true, true) => CALM_DOWN,
+                (true, false) => WHOA_CHILL,
+                (false, true) => SURE,
+                (false, false) => WHATEVER,
+            }
         }
-    } else if is_question {
-        return SURE;
-    } else if m.is_empty() {
-        return FINE;
     }
-    WHATEVER
 }
