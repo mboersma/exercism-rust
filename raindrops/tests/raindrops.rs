@@ -1,4 +1,4 @@
-extern crate raindrops;
+use raindrops;
 
 #[test]
 fn test_1() {
@@ -92,5 +92,5 @@ fn test_3125() {
 
 #[test]
 fn test_12121() {
-    assert_eq!("12121", raindrops::raindrops(12121));
+    assert_eq!("12121", raindrops::raindrops(12_121));
 }
