@@ -14,17 +14,17 @@ pub fn brackets_are_balanced(string: &str) -> bool {
         match c {
             '[' | '{' | '(' => stack.push(c),
             ']' => {
-                if !top(&mut stack, '[') {
+                if stack.pop() != Some('[') {
                     return false;
                 }
             }
             '}' => {
-                if !top(&mut stack, '{') {
+                if stack.pop() != Some('{') {
                     return false;
                 }
             }
             ')' => {
-                if !top(&mut stack, '(') {
+                if stack.pop() != Some('(') {
                     return false;
                 }
             }
@@ -33,13 +33,4 @@ pub fn brackets_are_balanced(string: &str) -> bool {
     }
 
     stack.is_empty()
-}
-
-/// Pops the top off the stack and returns whether it equals the given char.
-fn top(stack: &mut String, c: char) -> bool {
-    let p = stack.pop();
-    match p {
-        Some(p) => p == c,
-        None => false,
-    }
 }
