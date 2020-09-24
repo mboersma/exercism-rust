@@ -1,22 +1,23 @@
 //! Tallies up and summarizes the results of a football competition.
 
-use std::collections::HashMap;
+use std::{cmp::Ordering, collections::HashMap};
 
+/// Records the results of competition for a team.
 #[derive(Clone, Copy)]
 struct Team<'a> {
     name: &'a str,
     wins: u32,
-    losses: u32,
     draws: u32,
+    losses: u32,
 }
 
 impl<'a> Team<'a> {
     pub fn new(name: &'a str) -> Self {
         Self {
-            name: name,
+            name,
             wins: 0,
-            losses: 0,
             draws: 0,
+            losses: 0,
         }
     }
 
@@ -24,12 +25,12 @@ impl<'a> Team<'a> {
         self.wins += 1;
     }
 
-    pub fn add_loss(&mut self) {
-        self.losses += 1;
-    }
-
     pub fn add_draw(&mut self) {
         self.draws += 1;
+    }
+
+    pub fn add_loss(&mut self) {
+        self.losses += 1;
     }
 
     pub fn name(&self) -> &str {
@@ -37,7 +38,7 @@ impl<'a> Team<'a> {
     }
 
     pub fn matches_played(&self) -> u32 {
-        self.wins + self.losses + self.draws
+        self.wins + self.draws + self.losses
     }
 
     pub fn wins(&self) -> u32 {
@@ -62,22 +63,19 @@ pub fn tally(match_results: &str) -> String {
     let mut competition: HashMap<&str, Team> = HashMap::new();
 
     for line in match_results.lines() {
-        if line == "" || line.starts_with("#") {
-            continue;
-        }
-
         let parts: Vec<&str> = line.split(";").collect();
-        assert_eq!(parts.len(), 3);
-
-        if !competition.contains_key(parts[0]) {
-            competition.insert(parts[0], Team::new(parts[0]));
-        }
-        if !competition.contains_key(parts[1]) {
-            competition.insert(parts[1], Team::new(parts[1]));
-        }
-
+        let name1 = parts[0];
+        let name2 = parts[1];
         let result = parts[2];
-        let team1 = competition.get_mut(parts[0]).unwrap();
+
+        if !competition.contains_key(name1) {
+            competition.insert(name1, Team::new(name1));
+        }
+        if !competition.contains_key(name2) {
+            competition.insert(name2, Team::new(name2));
+        }
+
+        let team1 = competition.get_mut(name1).unwrap();
         match result {
             "win" => team1.add_win(),
             "loss" => team1.add_loss(),
@@ -85,7 +83,7 @@ pub fn tally(match_results: &str) -> String {
             _ => (),
         }
 
-        let team2 = competition.get_mut(parts[1]).unwrap();
+        let team2 = competition.get_mut(name2).unwrap();
         match result {
             "win" => team2.add_loss(),
             "loss" => team2.add_win(),
@@ -95,18 +93,24 @@ pub fn tally(match_results: &str) -> String {
     }
 
     let mut s = String::from("Team                           | MP |  W |  D |  L |  P");
-    // TODO: sort order!
-    competition.retain(|_k, v| {
+    let mut teams: Vec<Team> = competition.iter().map(|(_, team)| team.clone()).collect();
+    teams.sort_by(|a, b| {
+        let o = b.points().cmp(&a.points());
+        match o {
+            Ordering::Equal => a.name().cmp(&b.name()),
+            _ => o,
+        }
+    });
+    for team in teams {
         s.push_str(&format!(
             "\n{:<30} | {:>2} | {:>2} | {:>2} | {:>2} | {:>2}",
-            v.name(),
-            v.matches_played(),
-            v.wins(),
-            v.draws(),
-            v.losses(),
-            v.points()
+            team.name(),
+            team.matches_played(),
+            team.wins(),
+            team.draws(),
+            team.losses(),
+            team.points()
         ));
-        true
-    });
+    }
     s
 }
