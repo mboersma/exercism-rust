@@ -11,7 +11,6 @@ fn no_matches() {
 }
 
 #[test]
-#[ignore]
 fn detects_two_anagrams() {
     let word = "solemn";
     let inputs = &["lemons", "cherry", "melons"];
