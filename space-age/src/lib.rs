@@ -7,6 +7,7 @@ pub struct Duration {
 
 const EARTH_YEAR: f64 = 60.0 * 60.0 * 24.0 * 365.25; // sidereal year is 365.256 days
 
+// Note that this function is potentially lossy, due to float conversion.
 impl From<u64> for Duration {
     fn from(s: u64) -> Self {
         Self {
@@ -21,52 +22,22 @@ pub trait Planet {
     }
 }
 
-pub struct Mercury;
-pub struct Venus;
-pub struct Earth;
-pub struct Mars;
-pub struct Jupiter;
-pub struct Saturn;
-pub struct Uranus;
-pub struct Neptune;
+macro_rules! planet {
+    ($n:ident, $p:expr) => {
+        pub struct $n;
+        impl Planet for $n {
+            fn years_during(d: &Duration) -> f64 {
+                d.earth_years / $p
+            }
+        }
+    };
+}
 
-impl Planet for Mercury {
-    fn years_during(d: &Duration) -> f64 {
-        d.earth_years / 0.2408467
-    }
-}
-impl Planet for Venus {
-    fn years_during(d: &Duration) -> f64 {
-        d.earth_years / 0.61519726
-    }
-}
-impl Planet for Earth {
-    fn years_during(d: &Duration) -> f64 {
-        d.earth_years / 1.0
-    }
-}
-impl Planet for Mars {
-    fn years_during(d: &Duration) -> f64 {
-        d.earth_years / 1.8808158
-    }
-}
-impl Planet for Jupiter {
-    fn years_during(d: &Duration) -> f64 {
-        d.earth_years / 11.862615
-    }
-}
-impl Planet for Saturn {
-    fn years_during(d: &Duration) -> f64 {
-        d.earth_years / 29.447498
-    }
-}
-impl Planet for Uranus {
-    fn years_during(d: &Duration) -> f64 {
-        d.earth_years / 84.016846
-    }
-}
-impl Planet for Neptune {
-    fn years_during(d: &Duration) -> f64 {
-        d.earth_years / 164.79132
-    }
-}
+planet!(Mercury, 0.2408467);
+planet!(Venus, 0.61519726);
+planet!(Earth, 1.0);
+planet!(Mars, 1.8808158);
+planet!(Jupiter, 11.862615);
+planet!(Saturn, 29.447498);
+planet!(Uranus, 84.016846);
+planet!(Neptune, 164.79132);
